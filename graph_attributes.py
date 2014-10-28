@@ -9,9 +9,9 @@ def dir_enron(start, end):
     """
     :param start: Start time to count emails.
     :param end: End time to count emails.
-    :return:
+    :return: Simple directed graph with each edge having number of emails sent from a to b, time of first email, time of last email.
     """
     pass
 
-def additional_entron():
+def additional_enron():
     pass

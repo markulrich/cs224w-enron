@@ -1,2 +1,2 @@
-""" This file is for
+""" This file is for performing the MLP
 """
