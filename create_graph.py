@@ -5,6 +5,12 @@ import snap
 def simple_un_enron():
     return snap.LoadEdgeList(snap.PUNGraph, "data/snap/email-Enron.txt", 0, 1)
 
+def simple_dir_enron():
+    """
+    :return: Enron email graph, pretending it is directed.
+    """
+    return snap.LoadEdgeList(snap.PNGraph, "data/snap/email-Enron.txt", 0, 1)
+
 def dir_enron(start, end):
     """
     :param start: Start time to count emails.
