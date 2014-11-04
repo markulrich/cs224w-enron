@@ -3,15 +3,21 @@
 import snap
 import os
 import re
+from dateutil import parser
 
 FROM_REGEX = re.compile(r'From:?\s[^@]+@[^@]+\.[^@]+\n')
 TO_REGEX = re.compile(r'To:?\s[^@]+@[^@]+\.[^@]+\n')
+DATE_REGEX = re.compile(r'Date: \w\w\w, [0-9]+ \w\w\w [0-9]{4} \d\d:\d\d:\d\d [-+]?\d\d\d\d \([A-Z]{3}\)')
+DATE_FORMAT = '%a, %e %b %Y %H:%M:%S %z (%Z)'
 
 rootdir = './enron_mail_20110402/maildir'
 
 def load_data():
     emailToNid = {}
     id = 1
+    f_emails = open('email.txt','w')
+    f_edges = open('edges.txt', 'w')
+
     for subdir, dirs, files in os.walk(rootdir):
         for dir in dirs:
             user_dir = os.path.join(subdir, dir + '/sent')
@@ -22,7 +28,11 @@ def load_data():
                         with open(dir_entry_path, 'r') as email_file:
                             from_email = None
                             to_email = None
+                            date_email = None
                             for email_line in email_file:
+                                if from_email and to_email and date_email:
+                                    break
+
                                 # Handle from_field
                                 from_field = re.match(FROM_REGEX, email_line)
                                 if from_field:
@@ -33,6 +43,7 @@ def load_data():
                                     if from_field not in emailToNid:
                                         emailToNid[from_field] = id
                                         id += 1
+                                        f_emails.write('%d %s\n' % (id, from_field))
 
                                 # Handle to_field
                                 to_field = re.match(TO_REGEX, email_line)
@@ -44,8 +55,27 @@ def load_data():
                                     if to_field not in emailToNid:
                                         emailToNid[to_field] = id
                                         id += 1
+                                        f_emails.write('%d,%s\n' % (id, to_field))
 
-                            if from_email and to_email:
+                                # Handle date_email
+                                date_email = re.match(DATE_REGEX, email_line)
+                                if date_email:
+                                    email_string = date_email.group(0).split('Date:')[-1].lstrip()
+                                    date_obj = parser.parse(email_string)
+
+
+
+                            if from_email and to_email and date_obj:
                                 to_id = emailToNid[to_email]
                                 from_id = emailToNid[from_email]
-                                print 'Email from %s (id: %d) to %s (id: %d)' % (from_email, from_id, to_email, to_id)
+                                date_string = date_obj.strftime('%Y-%m-%d %H:%M:%S')
+
+                                #############################################
+                                # Format: date, to_id, from_id), email_path #
+                                #############################################
+                                to_write = '%s,%d,%d,%s\n' % (date_string, to_id, from_id, dir_entry_path)
+                                f_edges.write(to_write)
+                                print to_write
+
+    f_edges.close()
+    f_emails.close()
