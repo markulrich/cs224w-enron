@@ -14,7 +14,7 @@ NEIGHBORHOODS := 2
 #####
 # The PREDICTORS variable controls which link prediction methods from the link prediction library are used. Targets affected by this variable include "sm", "classify", and "plots". Currently, the specification of predictors and arguments has strict requirements. Consider the IDegree predictor, the degree of the source node in the prediction. This degree may either be considered in terms of in-edges or out-edges. To predict both, IDegree should be specified as IDegree_D. In directed networks, this will perform predictions IDegree_O and IDegree_I, using both in-edges and out-edges for predictions. In undirected networks, it will only perform one set of predictions since there is no concept of in-edges and out-edges. To perform predictions with only one set of edges in directed networks, you must explicitly remove IDegree_D from the top variable assignment and add IDegree_I or IDegree_O in the directed network conditional block. An example is shown in comments below with PropFlow. All predictor arguments must come after the specification of directionality (D/I/O) and all arguments must be separated form each other and form the predictor name by an underscore (_). The final block is for the addition of predictors that do not accept directionality. Currently this includes only PreferentialAttachment, which is explicitly set to use out-edges of source and in-edges of target in directed networks (degenerating to total degree of both nodes in undirected networks).
 #####
-PREDICTORS := IDegree_D JDegree_D IVolume_D JVolume_D CommonNeighbor_D JaccardCoefficient_D AdamicAdar_D PropFlow_D_5 IPageRank_D_0.85 JPageRank_D_0.85 RootedPageRank_D_0.15
+PREDICTORS := IDegree_D JDegree_D IVolume_D JVolume_D CommonNeighbor_D JaccardCoefficient_D AdamicAdar_D PropFlow_D_5 JPageRank_D_0.85 RootedPageRank_D_0.15
 PREDICTORS := $(PREDICTORS)
 ifeq ($(DIRECTED),1)
 	PREDICTORS := $(shell echo $(PREDICTORS) | sed 's/_D$$/_I/; s/_D /_I /g; s/_D_/_I_/g') $(shell echo $(PREDICTORS) | sed 's/_D$$/_O/; s/_D /_O /g; s/_D_/_O_/g')
@@ -28,7 +28,7 @@ PREDICTORS := $(PREDICTORS) PreferentialAttachment
 #####
 # The features variable and assignments work the same was as the PREDICTORS variable and assignments described above. This variable affects only the "classify" target. The variable specifies that features that should be used in supervised classification of links.
 #####
-FEATURES := IDegree_D JDegree_D IVolume_D JVolume_D CommonNeighbor_D JaccardCoefficient_D AdamicAdar_D PropFlow_D_5 IPageRank_D_0.85 JPageRank_D_0.85 RootedPageRank_D_0.15
+FEATURES := IDegree_D JDegree_D IVolume_D JVolume_D CommonNeighbor_D JaccardCoefficient_D AdamicAdar_D PropFlow_D_5 RootedPageRank_D_0.15
 ifeq ($(DIRECTED),1)
 	FEATURES := $(shell echo $(FEATURES) | sed 's/_D$$/_I/; s/_D /_I /g; s/_D_/_I_/g') $(shell echo $(FEATURES) | sed 's/_D$$/_O/; s/_D /_O /g; s/_D_/_O_/g')
 else
