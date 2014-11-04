@@ -8,11 +8,11 @@
 
 CONFIG := BIN
 ifeq ($(CONFIG),DEBUG) 
-	CFLAGS := -Wall -Werror -g
+	CFLAGS := -Wall -g
 	BINDIR := debug
 endif
 ifeq ($(CONFIG),BIN)
-	CFLAGS := -Wall -Werror -O3 -D NDEBUG
+	CFLAGS := -Wall -O3 -D NDEBUG
 	BINDIR := bin
 endif
 CC := g++
