@@ -14,7 +14,7 @@ rootdir = './enron_mail_20110402/maildir'
 
 def load_data():
     emailToNid = {}
-    id = 1
+    id = 0
     f_emails = open('email.txt','w')
     f_edges = open('edges.txt', 'w')
 
