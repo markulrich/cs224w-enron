@@ -8,21 +8,21 @@
 
 include ../Makefile.options
 
-SRC := enron-sent.txt.gz
+SRC := enron-small.txt.gz
 DIRECTED := 0
-WEIGHTED_STREAM := 1
+WEIGHTED_STREAM := 0
 SRC2STREAM := ./script/src_to_stream.pl
 
 PERIOD1 := 1999
 PERIOD2 := 2000
 PERIOD3 := 2001
 
-FEATURE := $(addprefix PERIOD,$(shell echo {1..4}))
-LABEL := PERIOD5
-UNSUPERVISED := $(addprefix PERIOD,$(shell echo {1..5}))
-TEST := PERIOD6
-COMPLETE := $(addprefix PERIOD,$(shell echo {1..6}))
-PERIODS := $(addprefix PERIOD,$(shell echo {1..6}))
+FEATURE := $(addprefix PERIOD,$(shell echo {1..1}))
+LABEL := PERIOD2
+UNSUPERVISED := $(addprefix PERIOD,$(shell echo {1..2}))
+TEST := PERIOD3
+COMPLETE := $(addprefix PERIOD,$(shell echo {1..3}))
+PERIODS := $(addprefix PERIOD,$(shell echo {1..3}))
 
 
 empty :=

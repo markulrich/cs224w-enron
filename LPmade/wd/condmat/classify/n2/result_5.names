@@ -1,0 +1,13 @@
+0,1
+IDegree: continuous
+JDegree: continuous
+IVolume: continuous
+JVolume: continuous
+CommonNeighbor: continuous
+JaccardCoefficient: continuous
+AdamicAdar: continuous
+PropFlow_5: continuous
+IPageRank_0.85: continuous
+JPageRank_0.85: continuous
+RootedPageRank_0.15: continuous
+PreferentialAttachment: continuous
