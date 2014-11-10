@@ -58,3 +58,9 @@ LPmade/wd/condmat/net/
 LPmade/wd/enron/Makefile
 LPmade/wd/condmat/sm/
 LPmade/wd/condmat/src/cond-mat.hg2.gz.tmp
+LPmade/wd/enron/Makefile
+LPmade/wd/enron/net/
+LPmade/wd/enron/sm/
+.gitignore
+LPmade/wd/enron/Makefile
+LPmade/wd/enron/stream/

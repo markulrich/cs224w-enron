@@ -26,31 +26,40 @@ LinkPredictor::~LinkPredictor() {
 
 void LinkPredictor::printOutNeighborScores( unsigned int degree ) {
 	// if the degree is 0, do all-pairs predictions
-	if( degree == 0 ) {
-		for( vertex_t vertex = 0; vertex < network.vertexCount(); ++vertex ) {
-			for( vertex_t neighbor = 0; neighbor < network.vertexCount(); ++neighbor ) {
-				if( vertex != neighbor && !network.hasEdge( vertex, neighbor ) ) {
-					// DO WE PREDICT LINKS THAT ALREADY EXIST? - // DO PROVIDED NETWORKS INCLUDE LINKS IN BOTH DIRECTIONS
-					double predictedValue = this->generateScore( vertex, neighbor );
-					unsigned int vertexName = this->network.translateIntToExt( vertex );
-					unsigned int neighborName = this->network.translateIntToExt( neighbor );
-					cout << vertexName << " " << neighborName << " " << predictedValue << "\n";;
-				}
-			}
-		}
-		return;
-	}
-	for( vertex_t vertex = 0; vertex < network.vertexCount(); vertex++ ) {
-		vector<vertex_t> verticesToPredict;
-		verticesToPredict = this->network.findOutNeighbors( vertex, degree );
-		for( vector<unsigned int>::const_iterator neighborIterator = verticesToPredict.begin(); neighborIterator != verticesToPredict.end(); neighborIterator++ ) {
-			vertex_t neighbor = *neighborIterator;
-			double predictedValue = this->generateScore( vertex, neighbor );
-			unsigned int vertexName = this->network.translateIntToExt( vertex );
-			unsigned int neighborName = this->network.translateIntToExt( neighbor );
-			cout << vertexName << " " << neighborName << " " << predictedValue << "\n";;
-		}
-	}
+    for( vertex_t vertex = 0; vertex < network.vertexCount(); ++vertex ) {
+        for( vertex_t neighbor = 0; neighbor < network.vertexCount(); ++neighbor ) {
+            double predictedValue = this->generateScore( vertex, neighbor );
+            unsigned int vertexName = this->network.translateIntToExt( vertex );
+            unsigned int neighborName = this->network.translateIntToExt( neighbor );
+            std::cout << vertexName << " " << neighborName << " " << predictedValue << std::endl;
+        }
+    }
+	// Previous implementation
+//	if( degree == 0 ) {
+//		for( vertex_t vertex = 0; vertex < network.vertexCount(); ++vertex ) {
+//			for( vertex_t neighbor = 0; neighbor < network.vertexCount(); ++neighbor ) {
+//				if( vertex != neighbor && !network.hasEdge( vertex, neighbor ) ) {
+//					// DO WE PREDICT LINKS THAT ALREADY EXIST? - // DO PROVIDED NETWORKS INCLUDE LINKS IN BOTH DIRECTIONS
+//					double predictedValue = this->generateScore( vertex, neighbor );
+//					unsigned int vertexName = this->network.translateIntToExt( vertex );
+//					unsigned int neighborName = this->network.translateIntToExt( neighbor );
+//					cout << vertexName << " " << neighborName << " " << predictedValue << "\n";;
+//				}
+//			}
+//		}
+//		return;
+//	}
+//	for( vertex_t vertex = 0; vertex < network.vertexCount(); vertex++ ) {
+//		vector<vertex_t> verticesToPredict;
+//		verticesToPredict = this->network.findOutNeighbors( vertex, degree );
+//		for( vector<unsigned int>::const_iterator neighborIterator = verticesToPredict.begin(); neighborIterator != verticesToPredict.end(); neighborIterator++ ) {
+//			vertex_t neighbor = *neighborIterator;
+//			double predictedValue = this->generateScore( vertex, neighbor );
+//			unsigned int vertexName = this->network.translateIntToExt( vertex );
+//			unsigned int neighborName = this->network.translateIntToExt( neighbor );
+//			cout << vertexName << " " << neighborName << " " << predictedValue << "\n";;
+//		}
+//	}
 }
 
 void LinkPredictor::printInNeighborScores( unsigned int degree ) {
