@@ -52,6 +52,9 @@ enron_mail_20110402/**
 *~
 #*#
 LPmade/wd/condmat/stream/
-.gitignore
 LPmade/wd/condmat/classify/
 LPmade/wd/condmat/net/
+.gitignore
+LPmade/wd/enron/Makefile
+LPmade/wd/condmat/sm/
+LPmade/wd/condmat/src/cond-mat.hg2.gz.tmp
