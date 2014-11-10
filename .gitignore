@@ -51,3 +51,7 @@ enron_mail_20110402/**
 *.pyc
 *~
 #*#
+LPmade/wd/condmat/stream/
+.gitignore
+LPmade/wd/condmat/classify/
+LPmade/wd/condmat/net/
