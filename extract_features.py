@@ -8,7 +8,7 @@ def write_features(network_file_name, name):
     call(['mkdir', dirName])
     parr = []; outarr = []
     for pred in PREDICTORS:
-        out = open('temp_' + pred, 'w')
+        out = open(dirName + '/temp_' + pred, 'w')
         parr.append(Popen(['./LPmade/netlib/bin/predict', '-f', network_file_name, PREDICTORS[0]], stdout=out))
         outarr.append(out)
     for p in parr:
