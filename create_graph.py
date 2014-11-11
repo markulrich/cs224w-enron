@@ -28,14 +28,14 @@ def load_data():
                         with open(dir_entry_path, 'r') as email_file:
                             from_email = None
                             to_email = None
-                            date_email = None
+                            date_obj = None
                             for email_line in email_file:
                                 if from_email and to_email and date_email:
                                     break
 
                                 # Handle from_field
                                 from_field = re.match(FROM_REGEX, email_line)
-                                if from_field:
+                                if from_field and not from_email:
                                     from_field = from_field.group(0).strip().split('From: ')[-1]
                                     from_field = from_field.split()[-1]
                                     from_field = from_field.translate(None, '<>')
@@ -43,11 +43,12 @@ def load_data():
                                     if from_field not in emailToNid:
                                         emailToNid[from_field] = id
                                         id += 1
-                                        f_emails.write('%d %s\n' % (id, from_field))
+                                        new_email = '%d,%s\n' % (emailToNid[from_field], from_field)
+                                        f_emails.write(new_email)
 
                                 # Handle to_field
                                 to_field = re.match(TO_REGEX, email_line)
-                                if to_field:
+                                if to_field and not to_email:
                                     to_field = to_field.group(0).strip().split('To: ')[-1]
                                     to_field = to_field.split()[-1]
                                     to_field = to_field.translate(None, '<>')
@@ -55,11 +56,12 @@ def load_data():
                                     if to_field not in emailToNid:
                                         emailToNid[to_field] = id
                                         id += 1
-                                        f_emails.write('%d,%s\n' % (id, to_field))
+                                        new_email = '%d,%s\n' % (emailToNid[to_field], to_field)
+                                        f_emails.write(new_email)
 
                                 # Handle date_email
                                 date_email = re.match(DATE_REGEX, email_line)
-                                if date_email:
+                                if date_email and not date_obj:
                                     email_string = date_email.group(0).split('Date:')[-1].lstrip()
                                     date_obj = parser.parse(email_string)
 
@@ -70,12 +72,14 @@ def load_data():
                                 from_id = emailToNid[from_email]
                                 date_string = date_obj.strftime('%Y-%m-%d %H:%M:%S')
 
-                                #############################################
-                                # Format: date, to_id, from_id), email_path #
-                                #############################################
+                                ############################################
+                                # Format: date, to_id, from_id, email_path #
+                                ############################################
                                 to_write = '%s,%d,%d,%s\n' % (date_string, to_id, from_id, dir_entry_path)
                                 f_edges.write(to_write)
-                                print to_write
 
     f_edges.close()
     f_emails.close()
+
+if __name__ == '__main__':
+    load_data()
