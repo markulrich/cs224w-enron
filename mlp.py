@@ -3,26 +3,25 @@
 from sklearn import linear_model
 from sklearn import cross_validation
 import numpy as np
+import os
 
 FEATURE_FILENAMES = ['TargetVals.txt', 'CommonNeighbor.txt', 'IDegree.txt', 'IPageRank.txt', 'IVolume.txt', 'JaccardCoefficient.txt', 'JDegree.txt', 'JPageRank.txt', 'JVolume.txt', 'PropFlow.txt', 'RootedPageRank.txt'] # lines: (from to target f1 f2)
 # All features are expected to be lines of the format (from, to, feature_value)
 # target_vals is lines of the format (from, to, target_value)
 # These features are all calculated for a given delta_x and delta_y
 
-def load_files(window, deltasecs=2592000):
-    NUM_EXAMPLES = sum(1 for line in open('./windows/%s/TargetVals.txt' % window))
-    next_window_start = window.split('_')[-1]
-    next_window_end = str(int(next_window_start) + deltasecs)
-    next_window = 'windows/time_%s_%s' % (next_window_start, next_window_end)
+def load_files(window, next_window):
+    deltasecs = int(window.split('_')[-1]) - int(window.split('_')[-2])
+    NUM_EXAMPLES = sum(1 for line in open('./%s/TargetVals.txt' % (window)))
     targets = np.zeros(NUM_EXAMPLES)
     print 'We have:', NUM_EXAMPLES, 'examples'
     print 'We have:', len(FEATURE_FILENAMES), 'features'
     X = np.zeros((NUM_EXAMPLES, len(FEATURE_FILENAMES)))
     lookupMap = {}
     col = 0
-    window_feature_filenames = ['windows/%s/%s' % (window, ff) for ff in FEATURE_FILENAMES]
+    window_feature_filenames = ['%s/%s' % (window, ff) for ff in FEATURE_FILENAMES]
     for feature_filename in FEATURE_FILENAMES:
-        with open('windows/' + window + '/' + feature_filename, 'r') as f:
+        with open(window + '/' + feature_filename, 'r') as f:
             row = 0
             for line in f:
                 split_line = line.split(' ')
@@ -42,21 +41,28 @@ def load_files(window, deltasecs=2592000):
 
     return X, targets, lookupMap
 
-X, y, lookupMap = load_files('time_909762180_912354180')
+def process_window_dir(window_dir):
+    windows = [name for name in os.listdir(window_dir) if os.path.isdir(os.path.join(window_dir, name))]
+    for i, window in enumerate(windows):
+        if i == len(windows) - 1: continue
+        X, y, lookupMap = load_files(window_dir + '/' + window, window_dir + '/' + windows[i+1])
 
-print X
-print y
+        #print X
+        #print y
+        print sum(y)
 
-# K-fold cross_validation
-kf = cross_validation.KFold(X.shape[1], n_folds=4)
+        # K-fold cross_validation
+        kf = cross_validation.KFold(X.shape[1], n_folds=4)
 
-clf = linear_model.LinearRegression()
-clf.fit(X[0:30], y[0:30])
-print 'R^2 (first 30)', clf.score(X[31:], y[31:])
+        clf = linear_model.LinearRegression()
+        clf.fit(X[0:30], y[0:30])
+        print 'R^2 (first 30)', clf.score(X[31:], y[31:])
 
-for train_index, test_index in kf:
-    X_train, X_test = X[train_index], X[test_index]
-    y_train, y_test = y[train_index], y[test_index]
-    clf = linear_model.LinearRegression()
-    clf.fit(X_train, y_train)
-    print 'R^2 of', clf.score(X_test, y_test)
+        for train_index, test_index in kf:
+            X_train, X_test = X[train_index], X[test_index]
+            y_train, y_test = y[train_index], y[test_index]
+            clf = linear_model.LinearRegression()
+            clf.fit(X_train, y_train)
+            print 'R^2 of', clf.score(X_test, y_test)
+
+process_window_dir('windows100')
