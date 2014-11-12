@@ -31,7 +31,7 @@ void LinkPredictor::printOutNeighborScores( unsigned int degree ) {
             double predictedValue = this->generateScore( vertex, neighbor );
             unsigned int vertexName = this->network.translateIntToExt( vertex );
             unsigned int neighborName = this->network.translateIntToExt( neighbor );
-            std::cout << vertexName << " " << neighborName << " " << predictedValue << std::endl;
+            std::cout << vertexName << " " << neighborName << " " << predictedValue << "\n";
         }
     }
 	// Previous implementation

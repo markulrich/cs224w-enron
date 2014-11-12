@@ -1,33 +1,55 @@
 import time
 import re
 import random
+import os
+
+TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+VP_NAME = './vertex_prefix.txt'
+
+def getWindowDirName(startTime, endTime):
+    if type(startTime) is str:
+        startTime = strtotime(startTime)
+    if type(endTime) is str:
+        endTime = strtotime(endTime)
+    return './windows/time_%d_%d/' % (int(time.mktime(startTime)), int(time.mktime(endTime)))
 
 def strtotime(strtime):
-    return time.strptime(strtime, "%Y-%m-%d %H:%M:%S")
+    return time.strptime(strtime, TIME_FORMAT)
 
 # omits timestamp (since each edge can have multiple timestamps)
 # start and end should be in format "YYYY-MM-DD HH:MM:SS"
-def edges_by_weight(file, start, end, perc=1.0):
-    filename = "./edges_weight_%d_%d.net" % (int(time.mktime(strtotime(start))), int(time.mktime(strtotime(end))))
+def edges_by_weight(startTime, endTime, perc=1.0):
+    directory = getWindowDirName(startTime, endTime)
+    if type(startTime) is str:
+        startTime = strtotime(startTime)
+    if type(endTime) is str:
+        endTime = strtotime(endTime)
+    edgesf = open('./edges.txt', 'r')
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    filename = directory + 'network.net'
     file_by_weight = open(filename, 'w')
     edges = {}
-    for line in file:
+    for line in edgesf:
         if random.random() < perc:
             tokens = line.split(',')
-            if strtotime(tokens[0]) >= strtotime(start) and strtotime(tokens[0]) <= strtotime(end):
+            if strtotime(tokens[0]) >= startTime and strtotime(tokens[0]) <= endTime:
                 src = int(tokens[1])
                 dst = int(tokens[2])
                 if (src, dst) in edges:
                     edges[(src, dst)] += 1
                 else:
                     edges[(src, dst)] = 1
-    vertex_file = open('./vertex_prefix.txt', 'r')
-    for line in vertex_file:
-        file_by_weight.write(line)
+    if not os.path.isfile(VP_NAME):
+        write_vertices()
+    with open(VP_NAME, 'r') as vertex_file:
+        for line in vertex_file:
+                file_by_weight.write(line)
     file_by_weight.write("*Edges %d\n" % (len(edges)))
     for edge in edges:
         file_by_weight.write("%d %d %d\n" % (edge[0], edge[1], edges[edge]))
     file_by_weight.close()
+    edgesf.close()
         
 # filters edges by time, all with weight 1
 # start and end should be in format "YYYY-MM-DD HH:MM:SS"
@@ -50,8 +72,9 @@ def get_emails(file):
         id_to_email[id] = email
     return id_to_email
 
-def write_vertices(emailsf):
-    vertexf = open('./vertex_prefix.txt', 'w')
+def write_vertices():
+    emailsf = open('./email.txt', 'r')
+    vertexf = open(VP_NAME, 'w')
     nodes = []
     for line in emailsf:
         nodes.append(int(line.split(',')[0]))
@@ -60,9 +83,8 @@ def write_vertices(emailsf):
     for i in nodes:
         vertexf.write("%d %d\n" % (count, i))
         count += 1
+    vertexf.close()
+    emailsf.close()
 
-emailsf = open('./email.txt', 'r')
-edgesf = open('./edges.txt', 'r')
-edges_by_weight(edgesf, "2000-09-01 00:00:00", "2000-09-30 23:59:59")
-edgesf.close()
-emailsf.close()
+if __name__ == '__main__':
+    edges_by_weight("2000-09-01 00:00:00", "2000-09-30 23:59:59")
