@@ -37,7 +37,7 @@ def genLabelFile(network_file_name, dirName):
                     intToExt[internal] = external
         if not processEdge:
             print('ERROR no edges found')
-    with open(dirName + '/TargetVals.txt', 'w') as out:
+    with open(dirName + '/EdgeWeight.txt', 'w') as out:
         for src in xrange(numNodes):
             for dst in xrange(numNodes):
                 out.write('{} {} {}\n'.format(intToExt[src], intToExt[dst], weights[(src, dst)]))#edges_weight_967791600_970383599

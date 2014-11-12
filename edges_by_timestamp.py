@@ -1,6 +1,5 @@
 import time
 import re
-import random
 import os
 
 TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -18,7 +17,7 @@ def strtotime(strtime):
 
 # omits timestamp (since each edge can have multiple timestamps)
 # start and end should be in format "YYYY-MM-DD HH:MM:SS"
-def edges_by_weight(startTime, endTime, perc=1.0):
+def edges_by_weight(startTime, endTime):
     directory = getWindowDirName(startTime, endTime)
     if type(startTime) is str:
         startTime = strtotime(startTime)
@@ -33,17 +32,16 @@ def edges_by_weight(startTime, endTime, perc=1.0):
     nodes = set()
     ex_to_in = {}
     for line in edgesf:
-        if random.random() < perc:
-            tokens = line.split(',')
-            if strtotime(tokens[0]) >= startTime and strtotime(tokens[0]) <= endTime:
-                src = int(tokens[1])
-                dst = int(tokens[2])
-                if (src, dst) in edges:
-                    edges[(src, dst)] += 1
-                else:
-                    edges[(src, dst)] = 1
-                    nodes.add(src)
-                    nodes.add(dst)
+        tokens = line.split(',')
+        if strtotime(tokens[0]) >= startTime and strtotime(tokens[0]) < endTime:
+            src = int(tokens[1])
+            dst = int(tokens[2])
+            if (src, dst) in edges:
+                edges[(src, dst)] += 1
+            else:
+                edges[(src, dst)] = 1
+                nodes.add(src)
+                nodes.add(dst)
     file_by_weight.write("*Vertices %d\n" % len(nodes))
     count = 0
     for node in nodes:
