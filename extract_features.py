@@ -3,6 +3,7 @@ import os
 import collections
 
 PREDICT_BIN_PATH = './LPmade/netlib/bin/predict'
+# TODO originally 'PropFlow_5', 'IPageRank_D_0.85', 'JPageRank_D_0.85', 'RootedPageRank_D_0.15'
 PREDICTORS = ['IDegree', 'JDegree', 'IVolume', 'JVolume', 'CommonNeighbor', 'JaccardCoefficient', 'AdamicAdar', 'PropFlow', 'IPageRank', 'JPageRank', 'RootedPageRank']
 
 def make_if_needed():
@@ -41,16 +42,11 @@ def genLabelFile(network_file_name, dirName):
             for dst in xrange(numNodes):
                 out.write('{} {} {}\n'.format(intToExt[src], intToExt[dst], weights[(src, dst)]))#edges_weight_967791600_970383599
 
-def write_features(network_file_name, name):
+def write_features(network_file_name, dirName):
     if not os.path.isfile(network_file_name):
         print('Sorry, {} is not a valid file.'.format(network_file_name))
         return
     make_if_needed()
-    # TODO originally 'PropFlow_5', 'IPageRank_D_0.85', 'JPageRank_D_0.85', 'RootedPageRank_D_0.15'
-    dirName = name
-    if os.path.exists(dirName):
-        call(['rm', '-r', dirName])
-    call(['mkdir', dirName])
     parr = []; outarr = []
     for pred in PREDICTORS:
         out = open(dirName + '/' + pred + '.txt', 'w')
