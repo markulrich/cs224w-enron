@@ -27,7 +27,7 @@ def edges_by_weight(startTime, endTime, perc=1.0):
     edgesf = open('./edges.txt', 'r')
     if not os.path.exists(directory):
         os.makedirs(directory)
-    filename = directory + 'network.net'
+    filename = directory + 'network.txt'
     file_by_weight = open(filename, 'w')
     edges = {}
     nodes = set()
