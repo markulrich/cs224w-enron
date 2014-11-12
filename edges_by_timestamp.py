@@ -30,6 +30,8 @@ def edges_by_weight(startTime, endTime, perc=1.0):
     filename = directory + 'network.net'
     file_by_weight = open(filename, 'w')
     edges = {}
+    nodes = set()
+    ex_to_in = {}
     for line in edgesf:
         if random.random() < perc:
             tokens = line.split(',')
@@ -40,14 +42,17 @@ def edges_by_weight(startTime, endTime, perc=1.0):
                     edges[(src, dst)] += 1
                 else:
                     edges[(src, dst)] = 1
-    if not os.path.isfile(VP_NAME):
-        write_vertices()
-    with open(VP_NAME, 'r') as vertex_file:
-        for line in vertex_file:
-                file_by_weight.write(line)
+                    nodes.add(src)
+                    nodes.add(dst)
+    file_by_weight.write("*Vertices %d\n" % len(nodes))
+    count = 0
+    for node in nodes:
+        file_by_weight.write("%d %d\n" % (count, node))
+        ex_to_in[node] = count
+        count += 1
     file_by_weight.write("*Edges %d\n" % (len(edges)))
     for edge in edges:
-        file_by_weight.write("%d %d %d\n" % (edge[0], edge[1], edges[edge]))
+        file_by_weight.write("%d %d %d\n" % (ex_to_in[edge[0]], ex_to_in[edge[1]], edges[edge]))
     file_by_weight.close()
     edgesf.close()
         
