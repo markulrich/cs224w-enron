@@ -31,7 +31,7 @@ def getDegDist(graph, inDeg=False):
 	print "average %s: %f" % (deg, (total/numNodes))
 
 graph = snap.LoadEdgeList(snap.PNEANet, "edges.txt", 1, 2, ',')
-print snap.GetClustCf(graph, -1)
+print "clustering coefficient: %f\n" % snap.GetClustCf(graph, -1)
 	
 getDegDist(graph)
 getDegDist(graph, True)
