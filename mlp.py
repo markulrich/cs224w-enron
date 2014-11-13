@@ -4,7 +4,7 @@ from multiprocessing import Pool
 from sklearn import linear_model
 from sklearn import cross_validation
 from sklearn.ensemble import RandomForestRegressor, BaggingRegressor, AdaBoostRegressor, GradientBoostingRegressor
-from sklearn.feature_selection import f_regression
+from sklearn.feature_selection import f_regression, SelectKBest
 from sklearn.svm import SVR
 import sklearn
 import numpy as np
@@ -14,9 +14,11 @@ import sys
 AVAIL_FEATURES = ['TargetVals.txt', 'CommonNeighbor.txt', 'IDegree.txt', 'IPageRank.txt', 'IVolume.txt', 'JaccardCoefficient.txt', 'JDegree.txt', \
             'JPageRank.txt', 'JVolume.txt', 'PropFlow.txt', 'RootedPageRank.txt'] # lines: (from to target f1 f2)
 
-GOOD_IND = [0,7,9,10]
+GOOD_IND = [0,1,4,6,7,9,10]
+#GOOD_IND = [0,7,9,10]
 FEATURES = [feature for i,feature in enumerate(AVAIL_FEATURES) if i in GOOD_IND]
 
+#TODO: recenter data!
 
 # All features are expected to be lines of the format (from, to, feature_value)
 # target_vals is lines of the format (from, to, target_value)
@@ -59,7 +61,7 @@ def process_window_dir(window_dir, model, features):
     scores = []
     #X = np.empty((0,len(FEATURES)), float)
     #y = np.empty((0,), float)
-    F = np.zeros(1,len(FEATURES))
+    F = np.zeros((1,len(FEATURES)))
     for i, window in enumerate(windows):
         if i == len(windows) - 1: continue
         X, y = load_files(window_dir + '/' + window, window_dir + '/' + windows[i+1], features)
@@ -67,8 +69,14 @@ def process_window_dir(window_dir, model, features):
         #X = np.append(X, X_new, axis=0)
         #y = np.append(y, y_new, axis=0)
 
-        F_new, _ = f_regression(X, y, center=True)
-        F = F + F_new
+        #F_new, _ = f_regression(X, y, center=True)
+        #F = F + F_new
+        b = SelectKBest(f_regression, k=5)
+        b.fit(X, y)
+        print b
+        print b.scores_
+        print b.pvalues_
+        print b.get_support()
 
 
 
@@ -82,7 +90,7 @@ def process_window_dir(window_dir, model, features):
         #     score = clf.score(X_test, y_test)
         #     print '{} score is {}'.format(model.__name__, score)
         #     scores.append(score)
-    print F / len(windows) - 1
+    #print F / len(windows) - 1
     return scores
 
 if __name__ == '__main__':
