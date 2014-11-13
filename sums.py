@@ -27,7 +27,7 @@ if __name__ == '__main__':
     for filename in os.listdir(sys.argv[1]):
         if filename.startswith('.'):
             continue
-        subt = sumWeightsNetwork(sys.argv[1] + filename + '/network.net')
+        subt = sumWeightsTargetVals(sys.argv[1] + filename + '/TargetVals.txt')
         print subt
         total += subt
     print 'Final total is %d' % total
