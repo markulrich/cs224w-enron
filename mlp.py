@@ -26,44 +26,37 @@ def load_files(window, next_window):
             row = 0
             for line in f:
                 split_line = line.split(' ')
-                lookupMap[row] = (split_line[0], split_line[1])
+                lookupMap[(split_line[0], split_line[1])] = row
                 X[row][col] = float(split_line[2].strip()) # must have only one feature
                 row += 1
 
             col += 1
 
     with open(next_window + '/TargetVals.txt', 'r') as f:
-        row = 0
         for line in f:
             split_line = line.split(' ')
-            if (split_line[0], split_line[1]) in lookupMap.values():
-                targets[row] = float(split_line[2].strip())
-                row += 1
+            if (split_line[0], split_line[1]) in lookupMap:
+                targets[lookupMap[(split_line[0], split_line[1])]] = float(split_line[2].strip())
 
-    return X, targets, lookupMap
+    return X, targets
 
 def process_window_dir(window_dir):
     windows = [name for name in os.listdir(window_dir) if os.path.isdir(os.path.join(window_dir, name))]
     for i, window in enumerate(windows):
         if i == len(windows) - 1: continue
-        X, y, lookupMap = load_files(window_dir + '/' + window, window_dir + '/' + windows[i+1])
+        X, y = load_files(window_dir + '/' + window, window_dir + '/' + windows[i+1])
 
-        #print X
-        #print y
-        print sum(y)
+        print 'sum of y is %d' % sum(y)
 
         # K-fold cross_validation
-        kf = cross_validation.KFold(X.shape[1], n_folds=4)
-
-        # clf = linear_model.LinearRegression()
-        # clf.fit(X[0:30], y[0:30])
-        # print 'R^2 (first 30)', clf.score(X[31:], y[31:])
+        kf = cross_validation.KFold(X.shape[0], n_folds=4)
 
         for train_index, test_index in kf:
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
             clf = linear_model.LinearRegression()
             clf.fit(X_train, y_train)
+            y_pred = clf.predict(X_test)
             print 'R^2 of', clf.score(X_test, y_test)
 
 if __name__ == '__main__':
