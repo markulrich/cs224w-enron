@@ -2,10 +2,13 @@
 """
 from multiprocessing import Pool
 from sklearn import linear_model
+from sklearn.linear_model import LinearRegression, SGDRegressor, BayesianRidge, Lasso, LassoLars, ElasticNet, Ridge
 from sklearn import cross_validation
 from sklearn.ensemble import RandomForestRegressor, BaggingRegressor, AdaBoostRegressor, GradientBoostingRegressor
 from sklearn.feature_selection import f_regression, SelectKBest
 from sklearn.svm import SVR
+from sklearn.preprocessing import StandardScaler
+from sklearn.tree import DecisionTreeRegressor
 import sklearn
 import numpy as np
 import os
@@ -14,6 +17,7 @@ import sys
 AVAIL_FEATURES = ['TargetVals.txt', 'CommonNeighbor.txt', 'IDegree.txt', 'IPageRank.txt', 'IVolume.txt', 'JaccardCoefficient.txt', 'JDegree.txt', \
             'JPageRank.txt', 'JVolume.txt', 'PropFlow.txt', 'RootedPageRank.txt'] # lines: (from to target f1 f2)
 
+#GOOD_IND = range(11)
 GOOD_IND = [0,1,4,6,7,9,10]
 #GOOD_IND = [0,7,9,10]
 FEATURES = [feature for i,feature in enumerate(AVAIL_FEATURES) if i in GOOD_IND]
@@ -57,15 +61,19 @@ def load_files(window, next_window, features):
 def process_window_dir(window_dir, model, features):
     # TODO this method breaks if there are timestamps with lexographic and numerical order mismatch
     # TODO: update to mark's new format of data
+    scaler = StandardScaler()
     windows = [name for name in os.listdir(window_dir) if os.path.isdir(os.path.join(window_dir, name))]
     scores = []
     #X = np.empty((0,len(FEATURES)), float)
     #y = np.empty((0,), float)
+    HARD_STOP = 3
     F = np.zeros((1,len(FEATURES)))
     for i, window in enumerate(windows):
         if i == len(windows) - 1: continue
-        X, y = load_files(window_dir + '/' + window, window_dir + '/' + windows[i+1], features)
-
+        if i >= HARD_STOP: break
+        X, y = load_files(window_dir + window, window_dir + windows[i+1], features)
+        scaler.fit(X)
+        X = scaler.transform(X)
         #X = np.append(X, X_new, axis=0)
         #y = np.append(y, y_new, axis=0)
 
@@ -85,7 +93,7 @@ def process_window_dir(window_dir, model, features):
         for train_index, test_index in kf:
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
-            clf = model()
+            clf = model(alpha=0.1)
             clf.fit(X_train, y_train)
             score = clf.score(X_test, y_test)
             print '{} score is {}'.format(model.__name__, score)
@@ -94,14 +102,7 @@ def process_window_dir(window_dir, model, features):
     return scores
 
 if __name__ == '__main__':
-    def call_pwd(model):
-        scores = process_window_dir(sys.argv[1], model, FEATURES)
-        return model.__name__, np.mean(scores), np.std(scores)
-
-    scores = process_window_dir(sys.argv[1], SVR, FEATURES)
+    model = Ridge
+    scores = process_window_dir(sys.argv[1], model, FEATURES)
     print '### PRINTING FINAL SCORES ###'
-    for r in scores:
-        print(r)
-    if len(sys.argv) > 2:
-        with open(sys.argv[2], 'w') as f:
-            f.write('{}\n'.format(r))
+    print model.__name__, 'mean', np.mean(scores), 'stddev', np.std(scores)
