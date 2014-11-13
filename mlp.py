@@ -4,6 +4,7 @@ from sklearn import linear_model
 from sklearn import cross_validation
 import numpy as np
 import os
+import sys
 
 FEATURE_FILENAMES = ['TargetVals.txt', 'CommonNeighbor.txt', 'IDegree.txt', 'IPageRank.txt', 'IVolume.txt', 'JaccardCoefficient.txt', 'JDegree.txt', 'JPageRank.txt', 'JVolume.txt', 'PropFlow.txt', 'RootedPageRank.txt'] # lines: (from to target f1 f2)
 # All features are expected to be lines of the format (from, to, feature_value)
@@ -54,9 +55,9 @@ def process_window_dir(window_dir):
         # K-fold cross_validation
         kf = cross_validation.KFold(X.shape[1], n_folds=4)
 
-        clf = linear_model.LinearRegression()
-        clf.fit(X[0:30], y[0:30])
-        print 'R^2 (first 30)', clf.score(X[31:], y[31:])
+        # clf = linear_model.LinearRegression()
+        # clf.fit(X[0:30], y[0:30])
+        # print 'R^2 (first 30)', clf.score(X[31:], y[31:])
 
         for train_index, test_index in kf:
             X_train, X_test = X[train_index], X[test_index]
@@ -65,4 +66,5 @@ def process_window_dir(window_dir):
             clf.fit(X_train, y_train)
             print 'R^2 of', clf.score(X_test, y_test)
 
-process_window_dir('windows100')
+if __name__ == '__main__':
+    process_window_dir(sys.argv[1])
