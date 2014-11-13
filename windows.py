@@ -32,16 +32,22 @@ def generate_window_networks(windows):
         edges_by_weight(start_time.strftime(TIME_FORMAT), end_time.strftime(TIME_FORMAT))
 
 def generate_window_features(windows):
-    for start_time, end_time in windows:
+    for start_time, end_time, next_time in windows:
         directory = getWindowDirName(start_time.strftime(TIME_FORMAT), end_time.strftime(TIME_FORMAT))
         write_features(directory + 'network.txt', directory)
 
 def generate_window_networks_and_features(windows):
-    for start_time, end_time in windows:
+    for start_time, end_time, next_time in windows:
         edges_by_weight(start_time.strftime(TIME_FORMAT), end_time.strftime(TIME_FORMAT))
         directory = getWindowDirName(start_time.strftime(TIME_FORMAT), end_time.strftime(TIME_FORMAT))
         write_features(directory + 'network.txt', directory)
 
 if __name__ == '__main__':
-    windows = getWindowDateTimes(time_increment=datetime.timedelta(days = 60))
-    generate_window_networks_and_features(windows)
+    # windows = getWindowDateTimes(time_increment=datetime.timedelta(days = 60))
+    # generate_window_networks_and_features(windows)
+    base = toDateTime('2000-01-01 00:00:00')
+    N_DELTAS = 10
+    delta = [datetime.timedelta(days = 2**i) for i in range(N_DELTAS)]
+    for i in range(N_DELTAS):
+        for j in range(N_DELTAS):
+            generate_window_features([(base - delta[i], base, base + delta[j])])

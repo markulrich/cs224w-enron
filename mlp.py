@@ -73,7 +73,9 @@ if __name__ == '__main__':
         return model.__name__, np.mean(scores), np.std(scores)
 
     scores = process_window_dir(sys.argv[1], linear_model.LinearRegression, FEATURES)
-    with open('try_SVR_classifiers.txt') as f:
-        for r in scores:
+    print '### PRINTING FINAL SCORES ###'
+    for r in scores:
+        print(r)
+    if len(sys.argv) > 2:
+        with open(sys.argv[2], 'w') as f:
             f.write('{}\n'.format(r))
-            print(r)
