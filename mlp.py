@@ -3,12 +3,21 @@
 from multiprocessing import Pool
 from sklearn import linear_model
 from sklearn import cross_validation
+from sklearn.ensemble import RandomForestRegressor, BaggingRegressor, AdaBoostRegressor, GradientBoostingRegressor
+from sklearn.feature_selection import f_regression
+from sklearn.svm import SVR
 import sklearn
 import numpy as np
 import os
 import sys
 
-FEATURES = ['TargetVals.txt', 'CommonNeighbor.txt', 'IDegree.txt', 'IPageRank.txt', 'IVolume.txt', 'JaccardCoefficient.txt', 'JDegree.txt', 'JPageRank.txt', 'JVolume.txt', 'PropFlow.txt', 'RootedPageRank.txt'] # lines: (from to target f1 f2)
+AVAIL_FEATURES = ['TargetVals.txt', 'CommonNeighbor.txt', 'IDegree.txt', 'IPageRank.txt', 'IVolume.txt', 'JaccardCoefficient.txt', 'JDegree.txt', \
+            'JPageRank.txt', 'JVolume.txt', 'PropFlow.txt', 'RootedPageRank.txt'] # lines: (from to target f1 f2)
+
+GOOD_IND = [0,7,9,10]
+FEATURES = [feature for i,feature in enumerate(AVAIL_FEATURES) if i in GOOD_IND]
+
+
 # All features are expected to be lines of the format (from, to, feature_value)
 # target_vals is lines of the format (from, to, target_value)
 # These features are all calculated for a given delta_x and delta_y
@@ -17,6 +26,7 @@ def load_files(window, next_window, features):
     deltasecs = int(window.split('_')[-1]) - int(window.split('_')[-2])
     NUM_EXAMPLES = sum(1 for line in open('./%s/TargetVals.txt' % (window)))
     targets = np.zeros(NUM_EXAMPLES)
+    print window, next_window
     print 'We have:', NUM_EXAMPLES, 'examples'
     print 'We have:', len(features), 'features'
     X = np.zeros((NUM_EXAMPLES, len(features)))
@@ -44,27 +54,35 @@ def load_files(window, next_window, features):
 
 def process_window_dir(window_dir, model, features):
     # TODO this method breaks if there are timestamps with lexographic and numerical order mismatch
+    # TODO: update to mark's new format of data
     windows = [name for name in os.listdir(window_dir) if os.path.isdir(os.path.join(window_dir, name))]
     scores = []
+    #X = np.empty((0,len(FEATURES)), float)
+    #y = np.empty((0,), float)
+    F = np.zeros(1,len(FEATURES))
     for i, window in enumerate(windows):
         if i == len(windows) - 1: continue
         X, y = load_files(window_dir + '/' + window, window_dir + '/' + windows[i+1], features)
 
-        print 'sum of y is %d' % sum(y)
-        clf = model()
-        clf.fit(X[:30], y[:30])
-        print 'small score is %g' % clf.score(X[30:60], y[30:60])
+        #X = np.append(X, X_new, axis=0)
+        #y = np.append(y, y_new, axis=0)
 
-        # K-fold cross_validation
-        kf = cross_validation.KFold(X.shape[0], n_folds=4)
-        for train_index, test_index in kf:
-            X_train, X_test = X[train_index], X[test_index]
-            y_train, y_test = y[train_index], y[test_index]
-            clf = model()
-            clf.fit(X_train, y_train)
-            score = clf.score(X_test, y_test)
-            print '{} score is {}'.format(model.__name__, score)
-            scores.append(score)
+        F_new, _ = f_regression(X, y, center=True)
+        F = F + F_new
+
+
+
+        # # K-fold cross_validation
+        # kf = cross_validation.KFold(X.shape[0], n_folds=4)
+        # for train_index, test_index in kf:
+        #     X_train, X_test = X[train_index], X[test_index]
+        #     y_train, y_test = y[train_index], y[test_index]
+        #     clf = model()
+        #     clf.fit(X_train, y_train)
+        #     score = clf.score(X_test, y_test)
+        #     print '{} score is {}'.format(model.__name__, score)
+        #     scores.append(score)
+    print F / len(windows) - 1
     return scores
 
 if __name__ == '__main__':
@@ -72,7 +90,7 @@ if __name__ == '__main__':
         scores = process_window_dir(sys.argv[1], model, FEATURES)
         return model.__name__, np.mean(scores), np.std(scores)
 
-    scores = process_window_dir(sys.argv[1], linear_model.LinearRegression, FEATURES)
+    scores = process_window_dir(sys.argv[1], SVR, FEATURES)
     print '### PRINTING FINAL SCORES ###'
     for r in scores:
         print(r)
