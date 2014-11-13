@@ -71,25 +71,25 @@ def process_window_dir(window_dir, model, features):
 
         #F_new, _ = f_regression(X, y, center=True)
         #F = F + F_new
-        b = SelectKBest(f_regression, k=5)
-        b.fit(X, y)
-        print b
-        print b.scores_
-        print b.pvalues_
-        print b.get_support()
+        # b = SelectKBest(f_regression, k=5)
+        # b.fit(X, y)
+        # print b
+        # print b.scores_
+        # print b.pvalues_
+        # print b.get_support()
 
 
 
-        # # K-fold cross_validation
-        # kf = cross_validation.KFold(X.shape[0], n_folds=4)
-        # for train_index, test_index in kf:
-        #     X_train, X_test = X[train_index], X[test_index]
-        #     y_train, y_test = y[train_index], y[test_index]
-        #     clf = model()
-        #     clf.fit(X_train, y_train)
-        #     score = clf.score(X_test, y_test)
-        #     print '{} score is {}'.format(model.__name__, score)
-        #     scores.append(score)
+        # K-fold cross_validation
+        kf = cross_validation.KFold(X.shape[0], n_folds=4)
+        for train_index, test_index in kf:
+            X_train, X_test = X[train_index], X[test_index]
+            y_train, y_test = y[train_index], y[test_index]
+            clf = model()
+            clf.fit(X_train, y_train)
+            score = clf.score(X_test, y_test)
+            print '{} score is {}'.format(model.__name__, score)
+            scores.append(score)
     #print F / len(windows) - 1
     return scores
 
