@@ -5,20 +5,19 @@ import os
 TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 VP_NAME = './vertex_prefix.txt'
 
-def getWindowDirName(startTime, endTime):
+def getWindowDirName(startTime, endTime, name):
     if type(startTime) is str:
         startTime = strtotime(startTime)
     if type(endTime) is str:
         endTime = strtotime(endTime)
-    return './windows/time_%d_%d/' % (int(time.mktime(startTime)), int(time.mktime(endTime)))
+    return './windows/%s/time_%d_%d/' % (name, int(time.mktime(startTime)), int(time.mktime(endTime)))
 
 def strtotime(strtime):
     return time.strptime(strtime, TIME_FORMAT)
 
 # omits timestamp (since each edge can have multiple timestamps)
 # start and end should be in format "YYYY-MM-DD HH:MM:SS"
-def edges_by_weight(startTime, endTime):
-    directory = getWindowDirName(startTime, endTime)
+def edges_by_weight(startTime, endTime, directory, networkName = 'network'):
     if type(startTime) is str:
         startTime = strtotime(startTime)
     if type(endTime) is str:
@@ -26,7 +25,7 @@ def edges_by_weight(startTime, endTime):
     edgesf = open('./edges.txt', 'r')
     if not os.path.exists(directory):
         os.makedirs(directory)
-    filename = directory + 'network.txt'
+    filename = directory + networkName + '.txt'
     file_by_weight = open(filename, 'w')
     edges = {}
     nodes = set()
@@ -88,6 +87,3 @@ def write_vertices():
         count += 1
     vertexf.close()
     emailsf.close()
-
-if __name__ == '__main__':
-    edges_by_weight("2000-09-01 00:00:00", "2000-09-30 23:59:59")

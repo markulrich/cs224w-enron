@@ -11,7 +11,7 @@ def make_if_needed():
         print('MAKING PREDICT BINARY, THIS WILL ONLY RUN THE FIRST TIME. WARNINGS EXPECTED')
         call('make', cwd = './LPmade/netlib/')
 
-def genLabelFile(network_file_name, dirName):
+def genLabelFile(network_file_name, dirName, output_name='/EdgeWeight.txt'):
     with open(network_file_name) as networkf:
         firstline = networkf.readline()
         prefix = '*Vertices '
@@ -37,10 +37,10 @@ def genLabelFile(network_file_name, dirName):
                     intToExt[internal] = external
         if not processEdge:
             print('ERROR no edges found')
-    with open(dirName + '/EdgeWeight.txt', 'w') as out:
+    with open(dirName + output_name, 'w') as out:
         for src in xrange(numNodes):
             for dst in xrange(numNodes):
-                out.write('{} {} {}\n'.format(intToExt[src], intToExt[dst], weights[(src, dst)]))#edges_weight_967791600_970383599
+                out.write('{} {} {}\n'.format(intToExt[src], intToExt[dst], weights[(src, dst)]))
 
 def write_features(network_file_name, dirName):
     if not os.path.isfile(network_file_name):
@@ -57,6 +57,3 @@ def write_features(network_file_name, dirName):
         p.wait()
     for out in outarr:
         out.close()
-
-if __name__ == '__main__':
-    write_features('edges_weight_967791600_970383599.net', 'TEST')
