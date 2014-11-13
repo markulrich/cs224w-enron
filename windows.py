@@ -5,8 +5,8 @@ from extract_features import write_features
 import datetime
 import time
 
-MIN_TIME = '1998-10-30 07:43:00'
-MAX_TIME = '2002-07-12 01:31:00'
+MIN_TIME = '1999-06-01 00:00:00'
+MAX_TIME = '2001-06-01 00:00:00'
 
 def getWindowDateTimes(start_time=MIN_TIME, time_increment=datetime.timedelta(days = 100), final_end_time=MAX_TIME):
     start_time = toDateTime(start_time)
