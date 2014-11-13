@@ -65,3 +65,7 @@ LPmade/wd/enron/sm/
 LPmade/wd/enron/Makefile
 LPmade/wd/enron/stream/
 TEST/
+windows/**
+windows/*
+windows100/*
+windows100/**
