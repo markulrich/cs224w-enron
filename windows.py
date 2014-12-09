@@ -33,7 +33,8 @@ def toDateTime(strtime):
 
 def generate_window_networks_and_features(windows, windowName):
     if os.path.isdir('windows/' + windowName):
-        print 'WARNING {} already exists'.format(windowName)
+        print 'ERROR {} already exists'.format(windowName)
+        return
     for start_time, end_time, next_time in windows:
         directory = getWindowDirName(start_time.strftime(TIME_FORMAT), end_time.strftime(TIME_FORMAT), windowName)
         edges_by_weight(start_time.strftime(TIME_FORMAT), end_time.strftime(TIME_FORMAT), directory, 'network')
