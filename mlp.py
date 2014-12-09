@@ -5,6 +5,7 @@ from sklearn import cross_validation
 import numpy as np
 import os
 import sys
+from sklearn.metrics import r2_score
 
 SUB_FEATURES = ['EdgeWeight.txt', 'JPageRank.txt', 'PropFlow.txt', 'IVolume.txt', 'RootedPageRank.txt']
 FEATURES = ['EdgeWeight.txt', 'CommonNeighbor.txt', 'IDegree.txt', 'IPageRank.txt', 'IVolume.txt', 'JaccardCoefficient.txt', 'JDegree.txt', 'JPageRank.txt', 'JVolume.txt', 'PropFlow.txt', 'RootedPageRank.txt'] # lines: (from to target f1 f2)
@@ -64,6 +65,18 @@ def process_window_dir(window_dir, model, features):
             print '{} score is {}'.format(model.__name__, score)
             scores.append(score)
     return scores
+
+def baseline_mean(test_x, test_y):
+    mean = 0.0
+    for x in test_x:
+        mean += x[0]
+
+    mean /= len(test_x)
+    print 'Mean baseline r^2 score of', r2_score(test_y, [mean] * len(test_x))
+
+def baseline_zero(test_x, test_y):
+    print 'Zero baseline r^2 score of', r2_score(test_y, [0.0] * len(test_x))
+
 
 if __name__ == '__main__':
     folders = [name for name in os.listdir(sys.argv[1])]
