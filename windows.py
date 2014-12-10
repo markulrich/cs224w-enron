@@ -8,7 +8,7 @@ import time
 import sys
 import os
 
-MIN_TIME = '2000-01-01 00:00:00'
+MIN_TIME = '2000-10-01 00:00:00'
 MAX_TIME = '2001-05-01 00:00:00'
 
 def getWindowDateTimes(start_time=MIN_TIME, time_increment=datetime.timedelta(days = 100), final_end_time=MAX_TIME):
@@ -25,9 +25,6 @@ def getWindowDateTimes(start_time=MIN_TIME, time_increment=datetime.timedelta(da
 def getWindowEpochs(start_time=MIN_TIME, time_increment=datetime.timedelta(days = 100), final_end_time=MAX_TIME):
     return ((start.strftime(TIME_FORMAT), end.strftime(TIME_FORMAT)) for start, end in getWindowDateTimes(start_time, time_increment, final_end_time))
 
-def getWindowNames(start_time=MIN_TIME, time_increment=datetime.timedelta(days = 100), final_end_time=MAX_TIME):
-    return (getWindowDirName(start.strftime(TIME_FORMAT), end.strftime(TIME_FORMAT)) for start, end in getWindowDateTimes(start_time, time_increment, final_end_time))
-
 def toDateTime(strtime):
     return datetime.datetime(*(strtotime(strtime)[0:6]))
 
@@ -35,8 +32,9 @@ def generate_window_networks_and_features(windows, windowName):
     if os.path.isdir('windows/' + windowName):
         print 'ERROR {} already exists'.format(windowName)
         return
-    for start_time, end_time, next_time in windows:
-        directory = getWindowDirName(start_time.strftime(TIME_FORMAT), end_time.strftime(TIME_FORMAT), windowName)
+    for i, times in enumerate(windows):
+        start_time, end_time, next_time = times
+        directory = getWindowDirName(i, windowName)
         edges_by_weight(start_time.strftime(TIME_FORMAT), end_time.strftime(TIME_FORMAT), directory, 'network')
         write_features(directory + 'network.txt', directory, (start_time, end_time))
         edges_by_weight(end_time.strftime(TIME_FORMAT), next_time.strftime(TIME_FORMAT), directory, 'future')
@@ -56,7 +54,7 @@ def gen_delta_windows():
         [call_gwnaf((i, j)) for j in range(N_DELTAS)]
         # p.map(call_gwnaf, [(i, j) for j in range(N_DELTAS)])
 
-def gen_linear_windows(days=60):
+def gen_linear_windows(days=30):
     windows = getWindowDateTimes(time_increment=datetime.timedelta(days=days))
     generate_window_networks_and_features(windows, 'attrdays' + str(days))
 

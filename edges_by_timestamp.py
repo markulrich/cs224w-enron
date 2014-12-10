@@ -5,12 +5,8 @@ import os
 TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 VP_NAME = './vertex_prefix.txt'
 
-def getWindowDirName(startTime, endTime, name):
-    if type(startTime) is str:
-        startTime = strtotime(startTime)
-    if type(endTime) is str:
-        endTime = strtotime(endTime)
-    return './windows/%s/time_%d_%d/' % (name, int(time.mktime(startTime)), int(time.mktime(endTime)))
+def getWindowDirName(i, name):
+    return './windows/%s/time%d/' % (name, i)
 
 def strtotime(strtime):
     return time.strptime(strtime, TIME_FORMAT)
